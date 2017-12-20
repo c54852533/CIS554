@@ -1,0 +1,40 @@
+//namespace
+//local varible > global , local namespce
+#include <iostream>
+using namespace std;
+
+//int x = 40;
+namespace one {
+	int x = 10;
+	//void fun() { cout << 500 << endl; }
+}
+
+namespace two {
+	class C
+	{
+	public:
+		int C1;
+
+	};
+	int x = 20;
+}
+int main() {
+
+	//int x = 50;
+
+	{
+		using namespace two;
+		std::cout << x << std::endl;//:: will refer to global variable
+
+	}
+	{
+		using namespace one;
+		std::cout << x << std::endl;//:: will refer to global variable
+
+	}
+	two::C  x1;
+	
+	getchar();
+	getchar();
+	return 0;
+}

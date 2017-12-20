@@ -1,0 +1,153 @@
+//HW1
+//Implement the three member functions of linked_list class: sort, remove_all, and insert
+//as described in the code blow
+//Due: 11:59pm, Friday, September 8
+//Submit a text vesion of your program to blackboard
+
+//Linked List Examples by C-Y (Roger) Chen, Syracuse University
+
+#include <iostream>
+using namespace std;
+
+class node {
+public:
+	int value;
+	node * next;
+	node() { next = nullptr; }
+	node(int k) { value = k; next = nullptr; }
+};
+
+class linked_list {
+public:
+	int num_nodes;
+	node * head;
+	linked_list() { num_nodes = 0; head = nullptr; }
+	void linked_list::new_make_random_list(int k, int m);
+	void print(); //Print values of all nodes from head node
+
+	void reverse(); //Reverse the order of nodes of linked list
+					//*********************
+					//Implement the following three member functions.  
+
+	void sort(); //Sort the nodes, based on ascending order of node values
+
+	void insert(int k); //Create a new node with values k, and properly add it to an already sorted list
+						//After the insertion, the entire linked list is still sorted.
+
+	void remove_all(int k); //Remove all nodes whose node values are equal to k
+
+};
+void linked_list::insert(int k) {
+	node *p = head;
+	node *p1;
+	int flag = 1;
+	p1 = new node(k);
+	for (p = head; (p->next != nullptr)&&(flag); p = p->next) {
+		if (k < head->value)
+		{
+			p1->next = head, head = p1;
+			break;
+		}
+		if ((k >= p->next->value) && (p->next->next == nullptr))
+		{
+			p->next->next = p1;
+			break;
+		}
+		if (k < p->next->value) {
+			p1->next = p->next;
+			p->next = p1;
+			flag = 0;
+		}		
+	}
+}
+void linked_list::remove_all(int k) {
+	node *p = head;
+	for (p = head; p->next != nullptr;  ) {
+		if (head->value == k)
+			head = p->next;
+		else if (p->next->value == k) {
+			p->next = p->next->next;
+			continue;
+		}	
+		p = p->next;
+	}
+
+}
+void linked_list::sort() {
+	node *p1 = head;
+	node *p2 = head;
+	if (head == nullptr)
+		return ;
+	for (; p1->next!= nullptr; p1 = p1->next) {
+		for (p2 = head; p2->next != nullptr; p2 = p2->next) {
+			if (p2->value > p2->next->value) {
+				int temp = p2->value;
+				p2->value = p2->next->value;
+				p2->next->value = temp;
+			}
+		}
+	}
+} //Sort the nodes, based on ascending order of node values
+
+void linked_list::new_make_random_list(int k, int m) {
+	node * p;
+	for (int i = 0; i < k; i++) {
+		p = new node(rand() % m);
+		p->next = head;
+		head = p;
+		num_nodes++;
+	}
+
+}
+
+void linked_list::print() {
+	node * p = head;
+	cout << endl;
+	while (p != nullptr) {
+		cout << p->value << " ";
+		p = p->next;
+	}
+}
+
+void linked_list::reverse() {
+	if (num_nodes <= 1) return;
+	node * p1 = head, *p2 = head->next, *p3;
+	while (p2 != nullptr) {
+		p3 = p2->next;
+		p2->next = p1;
+		if (p1 == head) p1->next = nullptr;
+		p1 = p2;
+		p2 = p3;
+	}
+	head = p1;
+}
+int main() {
+
+	//Some examples of tests for your program are given below
+	//During grading, other test cases will also be used
+	linked_list L1;
+	L1.new_make_random_list(50, 7);
+	L1.print();
+	L1.remove_all(1);
+	L1.print();
+	L1.remove_all(6);
+	L1.print();
+
+	linked_list L2;
+	L2.new_make_random_list(60, 20);
+	L2.sort();
+	L2.print();
+
+	L2.insert(-1);
+	L2.print();
+	L2.insert(20);
+	L2.print();
+	L2.insert(15);
+	L2.print();
+	L2.insert(10);
+	L2.print();
+	getchar();
+	getchar();
+	return 0;
+}
+

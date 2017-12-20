@@ -1,0 +1,77 @@
+//2017_04_13_Lecture_Recursive_postfix_infix_prefix
+#include <iostream>
+using namespace std;
+
+class node {
+public:
+	node * parent;
+	node * l_child;
+	node * r_child;
+	char value;
+	node() { parent = l_child = r_child = nullptr; }
+	node(char c) { parent = l_child = r_child = nullptr; value = c; }
+
+};
+
+void post_fix(node * p) {
+	if (p->value != '*' && p->value != '+') { cout << p->value; cout << " "; return; }
+	post_fix(p->l_child);
+	post_fix(p->r_child);
+	cout << p->value << " ";
+}
+void pre_fix(node *p) {
+	if (p->value != '*' && p->value != '+') { cout << p->value; return; }
+	cout << p->value << " ";
+	pre_fix(p->l_child);
+	pre_fix(p->r_child);
+}
+void in_fix(node *p) {
+	if (p->value != '*' && p->value != '+') { cout << p->value; return; }
+	in_fix(p->l_child);
+	cout << p->value << " ";
+	in_fix(p->r_child);
+
+}
+
+int main() {
+	node * root;
+	node * n1 = new node('+');
+	node * n2 = new node('+');
+	node * n3 = new node('g');
+	node * n4 = new node('*');
+	node * n5 = new node('*');
+	node * n6 = new node('+');
+	node * n7 = new node('c');
+	node * n8 = new node('d');
+	node * n9 = new node('+');
+	node * n10 = new node('a');
+	node * n11 = new node('b');
+	node * n12 = new node('e');
+	node * n13 = new node('f');
+	root = n1;
+	n1->l_child = n2;
+	n1->r_child = n3;
+	n2->l_child = n4;
+	n2->r_child = n5;
+	n4->l_child = n6;
+	n4->r_child = n7;
+	n5->l_child = n8;
+	n5->r_child = n9;
+	n6->l_child = n10;
+	n6->r_child = n11;
+	n9->l_child = n12;
+	n9->r_child = n13;
+	
+	post_fix(root);
+	cout << endl;
+	//pre_fix(root);
+
+
+
+	
+
+
+	getchar();
+	getchar();
+	return 0;
+}

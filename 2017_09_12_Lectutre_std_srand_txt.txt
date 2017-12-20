@@ -1,0 +1,26 @@
+//Operator overloading
+#include <iostream>
+#include <string>
+#include <time.h>
+
+using namespace std;
+
+
+int main() {
+	//without the using namespace std; statement, most key words will require std::, as 
+	//shown below
+	std::string s1 = "this_is_fun";
+	std::cout << s1 << std::endl;
+	
+	int j = 10;
+	srand(j++);//srand() set up seed for rand().  the default value is 1.
+	//j++ will continue to change seed values
+	for (int i = 0; i < 10; i++) cout << rand() %  10 +20 << " ";
+
+
+
+
+	getchar();
+	getchar();
+	return 0;
+}

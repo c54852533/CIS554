@@ -1,0 +1,23 @@
+#include <regex>
+#include <iostream>
+#include <string>
+using namespace std;
+
+int main() {
+	string str = "john@gmail.com;  david@yahoo.com;   kevin@outlook.com";
+
+	regex e("([[:w:]]+)@([[:w:]]+)\.com");
+
+	sregex_iterator pos(str.cbegin(), str.cend(), e);
+	sregex_iterator end; //default constructor defines past_the_end iterator
+	for (; pos != end; pos++) {
+		cout << "Matched:  " << pos->str() << endl;
+		cout << "user name:  " << pos->str(1) << endl;
+		cout << "domain name:  " << pos->str(2) << endl;
+		cout << endl;
+	}
+
+	cout << "+++++++++++++++++++++++++++++++++++++++++++++++\n\n";
+
+	cin >> str;
+}

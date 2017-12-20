@@ -1,0 +1,184 @@
+The following are reference code for HW1 and HW2. 
+
+Note that they were not called solution code -- No guarantee that it absolutely contain no bugs.
+They are for your reference only.
+
+
+For HW1:
+
+
+
+void linked_list::remove_all(int k) {
+	if (num_nodes == 0) return;
+	node  *p1;
+	while (head != nullptr &&  head->value == k) {
+		p1 = head->next;
+		delete  head;
+		num_nodes--;
+		head = p1;
+	}
+	if (num_nodes <= 1) return;
+	p1 = head;
+	node * p2;
+	while (p1->next != nullptr) {
+		if (p1->next->value == k) {
+			p2 = p1->next->next;
+			delete p1->next;
+			num_nodes--;
+			p1->next = p2;
+		}
+		else {
+			p1 = p1->next;
+		}
+	}
+}
+
+
+
+
+void linked_list::sort() {
+	node * p1 = head, *p2 = head, *p_min;
+	if (num_nodes <= 1) return;
+	int min;
+	while (p1 != nullptr) {
+		p2 = p1->next;
+		min = p1->value;
+		p_min = p1;
+		while (p2 != nullptr) {
+			if (p2->value < min) {
+				min = p2->value;
+				p_min = p2;
+			}
+			p2 = p2->next;
+		}
+		p_min->value = p1->value;
+		p1->value = min;
+		p1 = p1->next;
+	}
+}
+
+void linked_list::insert(int k) {
+	node * p = new node(k);
+	if (num_nodes == 0) { head = p; num_nodes++; return; }
+	if (k < head->value) { p->next = head; head = p; num_nodes++; return; }
+	node * p1, *p2;
+	p1 = head, p2 = p1->next;
+	while (p2 != nullptr) {
+		if (k < p2->value) {
+			p1->next = p;
+			p->next = p2;
+			num_nodes++;
+			return;
+		}
+		p1 = p2;
+		p2 = p1->next;
+	}
+	p1->next = p;
+}
+
+
+
+
+
+For HW2:
+
+
+void vector::add_node(int v, int p) {
+
+	node * p1 = head;
+	if (num_nodes == 0) {
+		if (v != 0) {
+			node * pp = new node(v, p);
+			head = pp;
+			num_nodes++;
+		}
+		return;
+	}
+	if (p <= head->position) {
+		if (p == head->position) {
+			if (v == 0) {
+				head = head->next;
+				num_nodes-- ;
+				delete p1;
+				return;
+			}
+			head->value = v;
+			return; 
+		}
+		if (v != 0) {
+			node * pp = new node(v, p);
+			pp->next = head;
+			head = pp;
+			num_nodes++;
+		}
+		return;
+	}
+
+	node * p2 = p1->next;
+	while (p2 != nullptr && p > p2->position) { p1 = p2; p2 = p2->next; }
+	if (p2 == nullptr) {
+		if (v != 0) {
+			node * pp = new node(v, p);
+			p1->next = pp;
+			num_nodes++;
+		}
+		return;
+	}
+	if (p == p2->position) {
+		if (v == 0) {
+			p1->next = p2->next;
+			delete p2;
+			num_nodes--;
+			return;
+		}
+		p2->value = v;
+		return;
+	}
+
+	if (p < p2->position) {
+		if (v != 0) {
+			node * pp = new node(v, p);
+			p1->next = pp;
+			pp->next = p2;
+			num_nodes++;
+		}
+		return;
+	}
+}
+
+vector vector::operator+ (vector V) {
+	vector temp;
+	if (size != V.size) { cout << "  Error!" << endl; return temp; }
+	node * p1 = head, *p2 = V.head;;
+	while (p1 != nullptr || p2 != nullptr) {
+		if (p1 == nullptr) { temp.add_node(p2->value, p2->position); p2 = p2->next; }
+		else if (p2 == nullptr) { temp.add_node(p1->value, p1->position); p1 = p1->next; }
+		else if (p1->position < p2->position) { temp.add_node(p1->value, p1->position); p1 = p1->next; }
+		else if (p2->position < p1->position) { temp.add_node(p2->value, p2->position); p2 = p2->next; }
+		else if (p1->position == p2->position) {
+			if ((p1->value + p2->value) != 0) {
+				temp.add_node(p1->value + p2->value, p1->position);
+			}
+			p1 = p1->next; p2 = p2->next;
+		}
+
+	}
+	return temp;
+}
+
+int vector::operator* (vector V) {
+	if (size != V.size) { cout << "Error" << endl; return -9999; }
+	int inner_product = 0;
+	node * p1 = head, *p2 = V.head, *pp;
+	while (p1 != nullptr && p2 != nullptr) {
+
+		if (p1->position < p2->position) { p1 = p1->next; }
+		else if (p2->position < p1->position) { p2 = p2->next; }
+		else if (p1->position == p2->position) {
+			inner_product += p1->value * p2->value;
+			p1 = p1->next; p2 = p2->next;
+
+		}
+	}
+	return inner_product;
+}

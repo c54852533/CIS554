@@ -1,0 +1,44 @@
+#include <iostream>
+#include <thread>
+using namespace std;
+
+void f1(int a, int b, int d) {
+	for (int i = 0; i < 1000; i++) {
+		d = 11111;
+		cout << "print from thread 1 :" << a + 2 * b << " d = " << d << endl;
+	}
+}
+
+void f2(int a, int d) {
+	for (int i = 0; i < 100; i++) {
+		d = 22222;
+		cout << "print from thread 2 :" << 2 * a + 6 << "d = " << d << endl;
+	}
+}
+
+int main() {
+
+	/*
+	int d = 100;
+	thread t1(f1, 5, 6, d);
+	thread t2(f2, 8, d);
+	for (int i = 0; i < 1000; i++)
+		cout << "print from main  :" << endl;
+	t1.join();
+	t2.join();
+	cout << "done join." << endl;
+	*/
+	int d = 10;
+
+	thread TT[1000];
+	for (int i = 0; i < 1000; i++)
+	{
+		TT[i] = thread(f2, i * 100, d*i);
+	}
+	 
+	for (int i = 0; i < 1000; i++) TT[i].join();
+
+	getchar();
+	getchar();
+	return 0;
+}

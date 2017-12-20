@@ -1,0 +1,24 @@
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+int main() {
+	int i;
+	char j;
+	cin >> i >> j;
+	cout << i << " " << j << endl;
+	ofstream out("data1.txt");
+	out << i << " " << j << endl;
+	out.close();
+
+	ifstream in("data1.txt");
+	in >> i >> j;
+	cout << i << " " << j << endl;
+
+	in.close();
+
+	getchar();
+	getchar();
+	return 0;
+}

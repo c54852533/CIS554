@@ -1,0 +1,39 @@
+
+#include <iostream>
+#include <map>
+#include <vector>
+#include <list>
+#include <string>
+
+using namespace std;
+int main() {
+
+	list<list<int> *> L1;
+	L1.push_back(new list<int>);
+
+
+	(*(L1.begin()))->push_back(67);
+
+	map<int, list<int> *> M1;
+	M1[2300] = new list<int>;
+	M1[2300]->push_back(67);
+
+	map<int, map<int, string>> M2;
+	map<int, string> M3;
+
+	M2[245] = M3;
+	map<int, map<int, string> *> M4;
+	M4[35] = new map<int, string>;
+
+	//Note that I changed a couple statements from lecture -- primarily to allow better understanding
+
+	map<int, map<int, list<int> *>> M5;
+	M5[78][100] = new list<int>;
+	M5[78][100]->push_back(1000);
+	cout <<M5[78][100]->size()<< " " <<  *(M5[78][100]->begin())<< endl;
+
+
+	getchar();
+	getchar();
+	return 0;
+}

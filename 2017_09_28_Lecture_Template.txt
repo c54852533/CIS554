@@ -1,0 +1,57 @@
+//template
+#include <iostream>
+using namespace std;
+
+class Three_D_2 {
+	int ht;
+	int wid;
+	int dep;
+	Three_D_2(int i, int j, int k) { ht = i; wid = j; dep = k; }
+	int vol() { return ht*wid*dep; }
+};
+
+class Three_D_1 {
+	double ht;
+	double wid;
+	double dep;
+	Three_D_1(double i, double j, double k) { ht = i; wid = j; dep = k; }
+	double vol() { return ht*wid* dep; }
+
+};
+
+template <class T> class Three_D{
+public:
+	T ht;
+	T wid;
+	T dep;
+	Three_D(T i, T j, T k) { ht = i; wid = j; dep = k; }
+	T vol() { return  ht * wid * dep; }
+	T area();
+
+};
+template<class T> T Three_D<T>::area() {
+
+	return (ht*wid + ht * dep + wid*dep);
+}
+
+
+template <class T1, class T2> class multi_type {
+public:
+
+	T1 first_type;
+	T2 second_type;
+
+
+};
+
+
+int main() {
+
+	Three_D<int> T1(3, 4, 5);
+	Three_D<double> T2(3.8, 2.1, 3.0);
+	cout << T2.area() << endl;
+	getchar();
+	getchar();
+	return 0;
+
+}

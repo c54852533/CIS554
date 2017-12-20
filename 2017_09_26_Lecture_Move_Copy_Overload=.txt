@@ -1,0 +1,95 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+void f1(int &k) {
+	cout << k << endl;
+}
+void f1(int &&k) {
+	cout << k*k << endl;
+}
+class big_data {
+public:
+	int size;
+	int * big_array;//define an array
+	big_data() { size = 0; big_array = nullptr; }//costructor
+	big_data(int k) {
+		size = k;
+		big_array = new int[k];
+		for (int i = 0; i < k; i++) big_array[i] = 0;
+	}
+	~big_data() { delete[] big_array; }//destructor
+
+
+	void make_random_array() {
+		for (int i = 0; i < size; i++) big_array[i] = rand() % 50;//0...49
+	}
+
+	big_data three_times() {
+		big_data temp(size);
+		for (int i = 0; i < size; i++) {
+			temp.big_array[i] = 3 * big_array[i];
+		}
+		return move(temp);//change variable temp from left to right ref
+	}
+	
+	big_data(const big_data &B)//copy construcotr
+	{
+		size = B.size;
+		big_array = new int[size];
+		for (int i = 0; i < size; i++) {
+			big_array[i] = B.big_array[i];
+		}
+	}
+
+
+	big_data(big_data &&B) {//move constructor
+	size = B.size;
+	big_array = B.big_array;
+	B.big_array = nullptr;
+	}
+
+	void operator=(big_data &&B) {
+
+		size = B.size;
+		big_array = B.big_array;
+		B.big_array = nullptr;
+	}
+	void operator=(big_data &B) {
+		size = B.size;
+		big_array = new int[size];
+		for (int i = 0; i < size; i++) {
+			big_array[i] = B.big_array[i];
+		}
+
+	}
+	void print() {
+		cout << endl;
+		for (int i = 0; i < size; i++) {
+			cout << big_array[i] << " ";
+		}
+	}
+};
+
+int main() {
+	/*
+	int i = 10;
+	f1(10);
+	f1(i);
+	f1(i + 1);
+	*/
+
+	big_data B1(20);
+	B1.make_random_array();
+	B1.print();
+	big_data B2, B3;
+	B2 = B1;
+	B2.print();
+	B1.big_array[2] = 1000;
+	cout << endl;
+	cout << B2.big_array[2] << endl;
+	B3 = B1.three_times();
+	B3.print();
+	getchar();
+	getchar();
+	return 0;
+}

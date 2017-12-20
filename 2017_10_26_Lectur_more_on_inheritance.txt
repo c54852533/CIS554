@@ -1,0 +1,47 @@
+//more on inheritance
+#include <iostream>
+using namespace std;
+//virtual funciton supports the concept of polymorphism
+class A {
+private:
+	int a0;
+public:
+	int a1;
+	int a2;
+	A() {} //As long as you define a constructor, you also need to define a default constructor.
+	A(int i, int j) { a1 = i; a2 = j; }
+	virtual int vf() { return 10; }
+};
+
+class B : public A { //A is base class, and B is derived class
+public:
+	int b1;
+	int b2;
+	B() {}
+	B(int i, int j, int k, int m) : A(i, j) { //invoking constructor of A
+		b1 = k;
+		b2 = m;
+	}
+	int vf() { return 100; }
+};
+
+int main() {
+	A o1(3, 5), o2;
+	A * p; //p is a pointer, pointing to a class A object
+	B o3(1, 2, 3, 4);
+	p = &o1;
+	p = &o3; //a pointer for base class can be used for derived class as well.
+	p->a1 = 10; //a1 is defined in the base class
+	//p->b1 = 100;  Error! p cannot be used for anything specific to the derived class
+	B *p1;
+	p1 = &o3;
+	p1->b1 = 100;  //This is OK because p1 is specific to the derived class
+
+	A * p3 = &o1;
+	B * p4 = &o3;
+	cout << p3->vf();
+	cout << p4->vf();
+	getchar();
+	getchar();
+	return 0;
+}

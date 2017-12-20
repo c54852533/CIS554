@@ -1,0 +1,32 @@
+#include <iostream>
+#include <string>
+#include <regex>
+
+using namespace std;
+
+int main() {
+	string str;
+
+	while (true) {
+		cin >> str;
+		smatch m; //typedef std::match_results<string>
+
+		regex e("([[:w:]]+)@([[:w:]]+)\.com");
+
+		bool found = regex_search(str, m, e);
+
+		cout << "m.size() " << m.size() << endl;
+		for (int n = 0; n < m.size(); n++) {
+			cout << "m[" << n << "]: str()=" << m[n].str() << endl;
+		}
+		cout << "m.prefix().str(): " << m.prefix().str() << endl;
+		cout << "m.suffix().str(): " << m.suffix().str() << endl;
+
+	}
+
+
+
+
+	getchar();
+	getchar();
+	return 0;

@@ -1,0 +1,104 @@
+//HW5 Threaded Quicksort
+//Due:  Tuesday (11/7) at 11:59PM
+//You need to create 4 new thread to perform quick_sort
+//Total Points: 25
+
+#include <iostream>
+#include <vector>
+#include <thread>  
+#include <windows.h>
+#include <fstream>
+
+
+using namespace std;
+
+//The following funciton will be the work for each thread
+void quick_sort(vector<int> &V, int i, int j)	
+{
+	int left = i;
+	int right = j;
+	int temp = V[i];
+	while (left < right)
+	{
+ 
+		while (V[right] >= temp && right > left) right--;
+
+		if (right > left)
+		{
+			V[left] = V[right];
+			left++;
+
+			while (V[left] <= temp && left < right)  left++;
+			if (left < right)
+			{
+				V[right] = V[left];
+				right--;
+			}
+		}
+
+	}
+	V[left] = temp;//fullfill the useless inside
+	if (i < (left - 1)) quick_sort(V, i, left - 1);
+	if ((right + 1) < j) quick_sort(V, right + 1, j);
+
+}
+int partition(vector<int> &V, int i, int j)
+{
+	int left = i;
+	int right = j;
+	int temp = V[i];
+	while (left < right)
+	{
+
+		while (V[right] >= temp && right > left) right--;
+
+		if (right > left)
+		{
+			V[left] = V[right];
+			left++;
+
+			while (V[left] <= temp && left < right)  left++;
+			if (left < right)
+			{
+				V[right] = V[left];
+				right--;
+			}
+		}
+
+	}
+	V[left] = temp;//fullfill the useless inside
+	return left;
+}
+
+
+
+
+
+int main() {
+	int n = 100000;
+	vector<int> V(n);//V has n elements.
+	for (int i = 0; i < 100000; i++) V[i] = rand() % 5000;
+
+	//You need to crate four threads to help perform sorting
+	//You need to then save the sorted result to output.txt
+	thread sort[4];
+	int mid = partition(V, 0, n-1);
+	int left = partition(V, 0, mid-1 );
+	int right = partition(V, mid+1, n-1);
+
+
+	sort[0] = thread(quick_sort,ref(V), 0, left-1);
+	sort[1] = thread(quick_sort,ref(V), left, mid-1);
+	sort[2] = thread(quick_sort,ref(V), mid, right-1);
+	sort[3] = thread(quick_sort,ref(V), right, n-1);
+
+	for (int request = 0; request < 4; request++) {
+		sort[request].join();
+	}
+
+	ofstream out("output.txt");
+	for (int i = 0; i < n; i++) out<<V[i]<<' ';
+	out.close();
+	getchar();
+}
+

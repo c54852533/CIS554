@@ -1,0 +1,51 @@
+#include <regex>
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+int main() {
+	string str;
+	while (true) {
+
+		cin >> str;
+		//regex e("abc");
+		//regex e("abc.");//. is anything except newline
+		//regex e("^abc."); //beginning with abc. in regex_search
+		//regex e("abc.$"); //ending with abc. in regex_search
+						  regex e("abc", regex_constants::icase);
+
+						  //regex e("abc?"); //zero or 1 preceding character
+						  //regex e("abc*"); //zero or more preceding charter
+						  //regex e("abc+"); // one or more preceding charter
+						  //	regex e("ab[cd]"); //ab followed by c or d
+						  //regex e("ab[cd]*"); //any char inside the square brackets
+						  //regex e("ab[^cd]*"); //any char not inside the square brackets
+						  //	regex e("ab[cd]{3}"); //any three char inside the square brackets
+						  //regex e("ab[cd]{3,5}"); //3 to 5
+						  //regex e("ab[cd]{3,}"); //3 or more
+						  //regex e("abc|de[fg\\]]"); //abc or de followed by f or g
+
+						  //regex e("(abc)(de)+\\1\\2"); //abc is now a group and can be invoked by \\1
+						 // regex e("(ab)c(de+)\\2\\1");
+						  //regex e("(ab|d)+f");
+						  //regex e("[[:w:]]+@[[:w:]]+\.com"); //[[:w:]] word character: digit, number, or underscore
+						  //http://www.cplusplus.com/reference/regex/ECMAScript/
+
+						  /*  regular exp grammars:
+
+						  ECMAScript -- default
+						  basic
+						  extended
+						  awk
+						  grep
+						  egrep
+						  */
+						  //regex e("(ab|d)+f", regex_constants::basic);  //use basic grammar
+						  //bool match = regex_match(str, e);
+		bool match = regex_search(str, e); //sub-string matching
+		cout << (match ? "Matched" : "Not Matched") << endl << endl;
+
+	}
+
+}

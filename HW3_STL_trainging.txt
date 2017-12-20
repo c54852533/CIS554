@@ -1,0 +1,167 @@
+//HW3
+//Due: 11:59PM, September 6 (Friday)
+/*
+I made some minor revision.
+You should use this HW3 version and ignore the previous version.
+
+The file HW3_Sample_Disply is my console display for the main funciton I provided.
+You are required to follow the same output format using my main funciton.
+Note that, during grading, other sample main functions can be used.
+
+Notice that there is one space in "CIS554 1 3".
+However, there are 2 space between "CIS554" and "CSE674".
+Moreover, there is a blank line at the beginning when each print function is invoked.
+*/
+#include <iostream>
+#include <list>
+#include <map>
+#include <string>
+using namespace std;
+
+class course {
+public:
+	string name;
+	int section;
+	int credits;
+	course() {}
+	course(string n, int s, int c) { name = n; section = s; credits = c; }
+	bool operator<(course c) { return (name < c.name); }
+	bool operator==(course c) { return (name == c.name); }
+};
+void add_student(map<int, map<int, list<course> * >> &DB, int id);
+void remove_student(map<int, map<int, list<course> * >> &DB, int id);
+void add_course(map<int, map<int, list<course> * >> &DB, int semester, int id, course c); //20171 Spring semester of 2017; 20172: Fall semester of 2017
+																						  //All courses in the list should be sorted according to name (increasing order)
+void drop_course(map<int, map<int, list<course> * >> &DB, int semester, int id, course c);
+void print_student_semester_courses(map<int, map<int, list<course> * >> &DB, int semester, int id);
+void print_student_all_courses(map<int, map<int, list<course> * >> &DB, int id);
+void print_DB(map<int, map<int, list<course> * >> &DB);
+
+
+void add_student(map<int, map<int, list<course> * >> &DB, int id) {
+	//make sure if there is already such a student
+
+	if (DB.find(id) != DB.end()) return;
+	map<int, list<course>*>M2;
+	DB[id] = M2;
+
+
+}
+void remove_student(map<int, map<int, list<course> * >> &DB, int id) {
+	map<int, list<course> * >::iterator it = DB[id].begin();
+	while (it != DB[id].end()) {
+		delete it->second;
+		it++;
+	}
+	DB.erase(id);
+	//first have to delete the course then to delete the student
+}
+
+
+void add_course(map<int, map<int, list<course> * >> &DB, int semester, int id, course c) {	
+	//make sure if there is already such a course
+	if (DB[id].find(semester) != DB[id].end()) {
+		DB[id][semester]->push_back(c);
+		DB[id][semester]->sort();
+	}
+	else {
+		DB[id][semester] = new list<course>;
+		DB[id][semester]->push_back(c);
+		DB[id][semester]->sort();
+	}
+
+}
+
+void drop_course(map<int, map<int, list<course> * >> &DB, int semester, int id, course c) {
+	DB[id][semester]->remove(c);
+}
+
+void print_student_semester_courses(map<int, map<int, list<course> * >> &DB, int semester, int id) {
+	list<course>::iterator it1=DB[id][semester]->begin();
+	cout << endl;
+	cout << "student id = " << id << "\nsemester = " << semester << "\n";
+	while (it1 != DB[id][semester]->end()) {
+		cout << it1->name << ' ' << it1->section << ' ' << it1->credits << "  ";
+		it1++;
+	}
+	cout << endl;
+}
+void print_student_all_courses(map<int, map<int, list<course> * >> &DB, int id) {
+	map<int, list<course>*>::iterator it1 = DB[id].begin();
+	cout << endl;
+	cout<< "student id = " << id;
+	while (it1 != DB[id].end()) {
+		cout << "\nsemester = " << it1->first  << "\n";
+		list<course>::iterator it2 = DB[id][it1->first]->begin();
+		while (it2 != DB[id][it1->first]->end()) {
+			cout << it2->name << ' ' << it2->section << ' ' << it2->credits << "  ";
+			it2++;
+		}
+		it1++;
+	}
+	cout << endl;
+}
+
+void print_DB(map<int, map<int, list<course> * >> &DB) {
+	cout << endl;
+	map<int, map<int, list<course> * >>::iterator it1 = DB.begin();
+	while (it1 != DB.end()) {
+		cout << "student id = " << it1->first <<'\n';
+		map<int, list<course> * >::iterator  it2 = DB[it1->first].begin();
+		while (it2 != DB[it1->first].end()) {
+			cout << "semester = " << it2->first << "\n";
+			list<course> ::iterator it3 = DB[it1->first][it2->first]->begin();
+			while (it3 != DB[it1->first][it2->first]->end()) {
+				cout << it3->name << ' ' << it3->section << ' ' << it3->credits << "  ";
+				it3++;
+
+			}
+			cout << endl;
+			it2++;
+		}
+		it1++;
+	}
+}
+
+int main() {
+	map<int, map<int, list<course> *>> DB;
+	add_student(DB, 11111);
+	course C1("CIS554", 1, 3), C2("CSE674", 1, 3), C3("MAT296", 8, 4), C4("WRT205", 5, 3);
+
+	add_course(DB, 20171, 11111, C1);
+	add_course(DB, 20171, 11111, C4);
+	add_course(DB, 20171, 11111, C3);
+	add_course(DB, 20171, 11111, C2);
+	print_student_semester_courses(DB, 20171, 11111);
+
+	drop_course(DB, 20171, 11111, C1);
+	print_student_semester_courses(DB, 20171, 11111);
+
+	add_course(DB, 20172, 11111, C2);
+	add_course(DB, 20172, 11111, C4);
+	add_course(DB, 20172, 11111, C3);
+	add_course(DB, 20172, 11111, C1);
+	print_student_all_courses(DB, 11111);
+
+	add_student(DB, 11112);
+	add_course(DB, 20171, 11112, C2);
+	add_course(DB, 20171, 11112, C4);
+	add_course(DB, 20171, 11112, C3);
+	add_course(DB, 20171, 11112, C1);
+	print_student_semester_courses(DB, 20171, 11112);
+
+	add_course(DB, 20172, 11112, C2);
+	add_course(DB, 20172, 11112, C4);
+	add_course(DB, 20172, 11112, C3);
+	add_course(DB, 20172, 11112, C1);
+	print_student_semester_courses(DB, 20172, 11112);
+
+	print_student_all_courses(DB, 11112);
+
+	print_DB(DB);
+	remove_student(DB, 11111);
+	print_DB(DB);
+	getchar();
+	getchar();
+	return 0;
+}

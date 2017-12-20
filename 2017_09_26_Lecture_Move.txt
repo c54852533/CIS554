@@ -1,0 +1,109 @@
+#include <iostream>
+using namespace std;
+
+class big_data {
+public:
+	int size;
+	//vector<list<int>> P;
+	int * big_array; //array declaration
+	big_data() { size = 0; big_array = nullptr; }
+	big_data(int k) { size = k;
+	big_array = new int[k];
+	for (int i = 0; i < size; i++) big_array[i] = 0;
+	}
+	void make_random_array() {
+		for (int i = 0; i < size; i++) big_array[i] = rand() % 25;//0 ..24
+	}
+	void print() {
+		cout << endl;
+		for (int i = 0; i < size; i++) {
+			cout << big_array[i] << " ";
+		}
+	}
+	~big_data() { //destructor
+
+		delete [] big_array;
+	}
+
+	big_data three_times() {
+		big_data temp(size);
+		temp.size = size;
+		temp.big_array = new int[size];
+		for (int i = 0; i < size; i++) temp.big_array[i] = 3 * big_array[i];
+		return move(temp); //move changes left ref to right ref
+	}
+	void operator=(big_data &B) { //overloading = with left ref
+		size = B.size;
+		big_array = new int[size];
+		for (int i = 0; i < size; i++) big_array[i] = B.big_array[i];
+	}
+
+	big_data(const big_data &B) { //copy constructor -- left ref
+		size = B.size;
+		big_array = new int[size];
+		for (int i = 0; i < size; i++) big_array[i] = B.big_array[i];
+	}
+
+	big_data(big_data &&B) {//move constructor -- right ref version of copy constuctor
+		size = B.size;
+		big_array = B.big_array;
+		B.big_array = nullptr;
+
+	}
+	void operator=(big_data &&B) {//right ref operator=
+		size = B.size;
+		big_array = B.big_array;
+		B.big_array = nullptr;
+	}
+
+
+
+};
+
+int main() {
+	big_data B1(30), B2, B3;
+
+
+	B1.make_random_array();
+	B1.print();
+	B2 = B1; //B2.operator=(B1);
+	B2.print();
+	B1.big_array[2] = 1000;
+	B2.print();
+
+	B3 = B1.three_times();
+	//B3.operator=(B1.three_times());  B1.three_times() is a right ref
+	B3.print();
+
+	getchar();
+	getchar();
+	return 0;
+
+}
+
+
+
+
+
+/*
+
+
+void f1(int &k) {//left ref
+	cout << k << endl;
+}
+void f1(int &&k){//right ref
+	cout << k*k << endl;
+}
+/*
+int main() {
+	/*
+	int i = 10;
+	f1(i);
+	f1(10);
+	
+
+	getchar();
+	getchar();
+	return 0;
+}
+*/

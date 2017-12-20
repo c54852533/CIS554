@@ -1,0 +1,19 @@
+#include <regex>
+#include <iostream>
+#include <string>
+using namespace std;
+
+int main() {
+	string str = "john@gmail.com;  david@yahoo.com;   kevin@outlook.com";
+
+	regex e("([[:w:]]+)@([[:w:]]+)\.com");
+	//regex e("([[:w:]]+)@([[:w:]]+)\.com", regex_constants::icase | regex_constants::basic);
+	string s =   regex_replace(str, e, "$1 is on $2");
+	//string s = regex_replace(str, e, "$1 is on $2", regex_constants::format_no_copy); //non-matched parts are not copied
+	//string s = regex_replace(str, e, "$1 is on $2", regex_constants::format_no_copy|regex_constants::format_first_only);
+	cout << s;
+	
+
+
+	cin >> str;
+}

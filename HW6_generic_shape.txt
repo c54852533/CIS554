@@ -1,0 +1,612 @@
+#include <iostream>
+#include <vector>
+#include <list>
+#include <ostream>
+#include <math.h> 
+using namespace std;
+
+class Point {
+	double x;
+	double y;
+public:
+	Point() {}
+	Point(double ptx, double pty) : x(ptx), y(pty) {}
+	Point(const Point &p) { x = p.x; y = p.y; } // copy constructor
+	double getX() {
+		return x;
+	}
+	double getY() {
+		return y;
+	}
+	friend ostream & operator<< (ostream &stream, Point &p); // operator overloading
+	Point operator+ (const Point& pt);
+	Point operator- (const Point& pt);
+};
+
+ostream &operator<<(ostream &stream, Point &p) {
+	stream << "(" << p.x << ", " << p.y << ")";
+	return stream;
+}
+
+Point Point::operator+(const Point& pt) {
+	Point result = *this;
+	result.x += pt.x;
+	result.y += pt.y;
+	return result;
+}
+
+Point Point::operator-(const Point& pt) {
+	Point result = *this;
+	result.x -= pt.x;
+	result.y -= pt.y;
+	return result;
+}
+
+class Shape : public Point {
+	vector<Point> corners;
+public:
+	virtual bool isShape(vector<Point>) = 0;
+	virtual double area() = 0;
+	virtual double perimeter() = 0;
+	virtual void display() = 0;
+	~Shape() {}
+};
+
+class Triangle :public Shape { // inherit from Shape
+	double _a, _b, _c, _s;
+	vector<Point> _P;
+public:
+	Triangle() {}
+	Triangle(vector<Point> P) : _P(P) {
+		_a = sqrt((P[0].getX() - P[1].getX()) * (P[0].getX() - P[1].getX()) + (P[0].getY() - P[1].getY()) * (P[0].getY() - P[1].getY()));
+		_b = sqrt((P[2].getX() - P[1].getX()) * (P[2].getX() - P[1].getX()) + (P[2].getY() - P[1].getY()) * (P[2].getY() - P[1].getY()));
+		_c = sqrt((P[2].getX() - P[0].getX()) * (P[2].getX() - P[0].getX()) + (P[2].getY() - P[0].getY()) * (P[2].getY() - P[0].getY()));
+		_s = (_a + _b + _c) / 2;
+	}
+	Triangle(const Triangle &T) { // copy constructor
+		_a = T._a; _b = T._b; _c = T._c; _s = T._s; _P = T._P;
+	}
+	bool isShape(vector<Point>);
+	double area();
+	double perimeter();
+	void display();
+	~Triangle() {}
+};
+
+class Rectangle : public Shape { // inherit from Shape
+	vector<Point> _P;
+	double _a, _b, _c;
+public:
+	Rectangle() {}
+	Rectangle(vector<Point> P) : _P(P) {
+		if (P.size() > 3) { // if more than 3 points input
+			_a = sqrt((P[0].getX() - P[1].getX())*(P[0].getX() - P[1].getX()) + (P[0].getY() - P[1].getY())*(P[0].getY() - P[1].getY()));
+			_b = sqrt((P[0].getX() - P[2].getX())*(P[0].getX() - P[2].getX()) + (P[0].getY() - P[2].getY())*(P[0].getY() - P[2].getY()));
+			_c = sqrt((P[0].getX() - P[3].getX())*(P[0].getX() - P[3].getX()) + (P[0].getY() - P[3].getY())*(P[0].getY() - P[3].getY()));
+		}
+		if (P.size() == 3) { // if 3 points input
+			_a = sqrt((P[0].getX() - P[1].getX())*(P[0].getX() - P[1].getX()) + (P[0].getY() - P[1].getY())*(P[0].getY() - P[1].getY()));
+			_b = sqrt((P[0].getX() - P[2].getX())*(P[0].getX() - P[2].getX()) + (P[0].getY() - P[2].getY())*(P[0].getY() - P[2].getY()));
+		}
+	}
+	Rectangle(const Rectangle &R) { // copy constructor
+		_a = R._a; _b = R._b; _c = R._c; _P = R._P;
+	}
+	double dis(Point a, Point b);
+	bool mid(Point a, Point b, Point c, Point d);
+	bool isShape(vector<Point>);
+	double area();
+	double perimeter();
+	void display();
+	~Rectangle() {}
+};
+
+class Square : public Rectangle { // inherit from Rectangle
+	vector<Point> _P;
+	double _a, _b, _c;
+public:
+	Square() {}
+	Square(vector<Point> P) : _P(P) {
+		if (P.size() > 3) { // if more than 3 points input
+			_a = sqrt((P[0].getX() - P[1].getX())*(P[0].getX() - P[1].getX()) + (P[0].getY() - P[1].getY())*(P[0].getY() - P[1].getY()));
+			_b = sqrt((P[0].getX() - P[2].getX())*(P[0].getX() - P[2].getX()) + (P[0].getY() - P[2].getY())*(P[0].getY() - P[2].getY()));
+			_c = sqrt((P[0].getX() - P[3].getX())*(P[0].getX() - P[3].getX()) + (P[0].getY() - P[3].getY())*(P[0].getY() - P[3].getY()));
+		}
+		if (P.size() == 3) { // if 3 points input
+			_a = sqrt((P[0].getX() - P[1].getX())*(P[0].getX() - P[1].getX()) + (P[0].getY() - P[1].getY())*(P[0].getY() - P[1].getY()));
+			_b = sqrt((P[0].getX() - P[2].getX())*(P[0].getX() - P[2].getX()) + (P[0].getY() - P[2].getY())*(P[0].getY() - P[2].getY()));
+		}
+		if (P.size() == 2) { // if two points input, use as two diagonal points
+			_a = sqrt((P[0].getX() - P[1].getX())*(P[0].getX() - P[1].getX()) + (P[0].getY() - P[1].getY())*(P[0].getY() - P[1].getY()));
+		}
+	}
+	Square(const Square &S) { // copy constructor
+		_a = S._a; _b = S._b; _c = S._c; _P = S._P;
+	}
+	bool isShape(vector<Point>);
+	double area();
+	double perimeter();
+	void display();
+	~Square() {}
+};
+
+int main() {
+	Point a(0, 0), b(4, 0), c(0, 4), d(4, 4), e(0, 6), f(4, 6), g(6, 6);
+	cout << "the given points are:" << a << b << c << d << e << f << g << g - f << endl << endl;
+	vector<Point> point1, point2, point3, point4; // 4 set of points
+	point1.push_back(a);
+	point1.push_back(b);
+	point1.push_back(d);
+	point1.push_back(c);
+	cout << "case 1: given more than 3 points of which the first 3 can form a triangle:";
+	Triangle T1(point1);
+	T1.display();
+	cout << "case 2: given 4 points that can form a rectangle:";
+	Rectangle R1(point1);
+	R1.display();
+	cout << "case 3: directly print out the perimeter of the rectangle:";
+	cout << endl << "the perimeter of the rectangle is " << R1.perimeter() << endl << endl;
+	cout << "case 4: given 4 points that can form a square:";
+	Square S1(point1);
+	S1.display();
+	point2.push_back(e);
+	point2.push_back(b);
+	point2.push_back(f);
+	point2.push_back(a);
+	Square S2(point2);
+	cout << "case 5: given 4 points that cannot form a square:";
+	cout << "the area of the square is " << S2.area() << endl << endl;
+	point3.push_back(e);
+	point3.push_back(f);
+	point3.push_back(d);
+	cout << "case 6: given only 3 points that can form a rectangle:";
+	Rectangle R3(point3);
+	R3.display();
+	cout << "case 7: given 3 points but cannot form a square:";
+	Square S3(point3);
+	S3.display();
+	point4.push_back(g);
+	point4.push_back(d);
+	cout << "case 8: given 2 only points for a rectagnle:";
+	Rectangle R4(point4);
+	R4.display();
+	cout << "case 9: given 2 points that can form a square:";
+	Square S4(point4);
+	S4.display();
+	getchar();
+	getchar();
+	return 0;
+}
+
+bool Triangle::isShape(vector<Point> P) { // judge whether the input points can form a triangle
+	for (int i = 0; i < 2; i++) {
+		for (int j = i + 1; j < 3; j++)
+			if (P[i].getX() == P[j].getX() && P[i].getY() == P[j].getY())
+				return false;
+	}
+	list<double> Length;
+	Length.push_back(_a);
+	Length.push_back(_b);
+	Length.push_back(_c);
+	Length.sort();
+	list<double>::iterator it;
+	it = Length.begin();
+	double sumLength = *it;
+	it++;
+	sumLength += *it;
+	it++;
+	if (sumLength > *it) return true;
+	return false;
+}
+
+double Triangle::area() {
+	if (isShape(_P)) {
+		return sqrt(_s*(_s - _a) * (_s - _b) * (_s - _c));
+	}
+	else {
+		cout << endl << "the given points cannot form a triangle" << endl;
+		return -1;
+	}
+}
+
+double Triangle::perimeter() {
+	if (isShape(_P)) {
+		return 2 * _s;
+	}
+	else {
+		cout << endl << "the given points cannot form a triangle" << endl;
+		return -1;
+	}
+}
+
+void Triangle::display() { // print out the input points, area and perimeter
+	if (isShape(_P)) {
+		cout << endl;
+		cout << "----Triangle----" << endl;
+		cout << "P: ";
+		for (auto it : _P)
+			cout << "[" << it << "] ";
+		cout << endl;
+		cout << "Area: " << area() << endl;
+		cout << "Perimeter: " << perimeter() << endl << endl;
+	}
+	else cout << endl << "the given points cannot form a triangle" << endl << endl;
+}
+
+double Rectangle::dis(Point a, Point b) {
+	return double((a.getX() - b.getX()) * (a.getX() - b.getX()) + (a.getY() - b.getY()) * (a.getY() - b.getY()));
+}
+
+bool Rectangle::mid(Point a, Point b, Point c, Point d) {
+	if (a.getX() + b.getX() == c.getX() + d.getX() && a.getY() + b.getY() == c.getY() + d.getY()) return true;
+	return false;
+}
+
+bool Rectangle::isShape(vector<Point> _P) { // judge whether the input points can form a rectangle
+	if (_P.size() > 3) { // if input more than 3 points
+		for (int i = 0; i < 4; i++) {
+			for (int j = i + 1; j < 4; j++)
+				if (_P[i].getX() == _P[j].getX() && _P[i].getY() == _P[j].getY())
+					return false;
+		}
+		if (dis(_P[0], _P[1]) == dis(_P[2], _P[3]) && mid(_P[0], _P[1], _P[2], _P[3]))
+			return true;
+		if (dis(_P[0], _P[2]) == dis(_P[1], _P[3]) && mid(_P[0], _P[2], _P[1], _P[3]))
+			return true;
+		if (dis(_P[0], _P[3]) == dis(_P[1], _P[2]) && mid(_P[0], _P[3], _P[1], _P[2]))
+			return true;
+		return false;
+	}
+	else {
+		if (_P.size() == 3) { // if input only 3 points
+			for (int i = 0; i < 3; i++) {
+				for (int j = i + 1; j < 3; j++)
+					if (_P[i].getX() == _P[j].getX() && _P[i].getY() == _P[j].getY())
+						return false;
+			}
+			if (dis(_P[0], _P[1]) == dis(_P[1], _P[2]) + dis(_P[0], _P[2]))
+				return true;
+			if (dis(_P[0], _P[2]) == dis(_P[0], _P[1]) + dis(_P[1], _P[2]))
+				return true;
+			if (dis(_P[1], _P[2]) == dis(_P[0], _P[1]) + dis(_P[0], _P[2]))
+				return true;
+			return false;
+		}
+		else return false; // if input less than 3 points, cannot form a rectangle
+	}
+}
+
+double Rectangle::area() {
+	if (_P.size() > 3) { // if input are more than 3 points
+		if (isShape(_P)) {
+			list<double> listLength;
+			listLength.push_back(_a);
+			listLength.push_back(_b);
+			listLength.push_back(_c);
+			listLength.sort();
+			list<double>::iterator it;
+			it = listLength.begin();
+			double areaRec = *it;
+			it++;
+			areaRec *= *it;
+			return areaRec;
+		}
+		else {
+			cout << endl << "the given points cannot form a rectangle" << endl;
+			return -1;
+		}
+	}
+	else {
+		if (_P.size() == 3) { // if input are 3 points
+			if (isShape(_P)) {
+				double length1 = sqrt(dis(_P[0], _P[1]));
+				double length2 = sqrt(dis(_P[0], _P[2]));
+				double length3 = sqrt(dis(_P[1], _P[2]));
+				list<double> listLength;
+				listLength.push_back(length1);
+				listLength.push_back(length2);
+				listLength.push_back(length3);
+				listLength.sort();
+				list<double>::iterator it;
+				it = listLength.begin();
+				double areaRec = *it;
+				it++;
+				areaRec *= *it;
+				return areaRec;;
+			}
+			else {
+				cout << endl << "the given points cannot form a rectangle" << endl;
+				return -1;
+			}
+		}
+		else { // if input are less than 3 points, cannot form only one rectangle
+			cout << endl << "the given points cannot form only one rectangle" << endl;
+			return -1;
+		}
+	}
+}
+
+double Rectangle::perimeter() {
+	if (_P.size() > 3) { // if input are more than 3 points
+		if (isShape(_P)) {
+			list<double> listLength;
+			listLength.push_back(_a);
+			listLength.push_back(_b);
+			listLength.push_back(_c);
+			listLength.sort();
+			list<double>::iterator it;
+			it = listLength.begin();
+			double periRec = 2 * (*it);
+			it++;
+			periRec += 2 * (*it);
+			return periRec;
+		}
+		else {
+			cout << endl << "the given points cannot form a rectangle" << endl;
+			return -1;
+		}
+	}
+	else {
+		if (_P.size() == 3) { // if input are 3 points
+			if (isShape(_P)) {
+				double length1 = sqrt(dis(_P[0], _P[1]));
+				double length2 = sqrt(dis(_P[0], _P[2]));
+				double length3 = sqrt(dis(_P[1], _P[2]));
+				list<double> listLength;
+				listLength.push_back(length1);
+				listLength.push_back(length2);
+				listLength.push_back(length3);
+				listLength.sort();
+				list<double>::iterator it;
+				it = listLength.begin();
+				double periRec = 2 * (*it);
+				it++;
+				periRec += 2 * (*it);
+				return periRec;
+			}
+			else {
+				cout << endl << "the given points cannot form a rectangle" << endl;
+				return -1;
+			}
+		}
+		else { // if input are less than 3 points, cannot form only one rectangle
+			cout << endl << "the given points cannot form only one rectangle" << endl;
+			return -1;
+		}
+	}
+}
+
+void Rectangle::display() { // print out the input points, area and perimeter
+	if (isShape(_P)) {
+		cout << endl;
+		cout << "----Rectangle----" << endl;
+		cout << "P: ";
+		for (auto it : _P)
+			cout << "[" << it << "] ";
+		cout << endl;
+		cout << "Area: " << area() << endl;
+		cout << "Perimeter: " << perimeter() << endl;
+		if (_P.size() == 3) { // calculate the last point
+			double x, y;
+			if (dis(_P[0], _P[1]) > dis(_P[0], _P[2]) && dis(_P[0], _P[1]) > dis(_P[1], _P[2])) {
+				x = _P[0].getX()+ _P[1].getX()- _P[2].getX();
+				y = _P[0].getY()+ _P[1].getY()- _P[2].getY();
+			}
+			else if (dis(_P[0], _P[2]) > dis(_P[0], _P[1]) && dis(_P[0], _P[2]) > dis(_P[1], _P[2])) {
+				x = _P[0].getX()- _P[1].getX()+ _P[2].getX();
+				y = _P[0].getY()- _P[1].getY()+ _P[2].getY();
+			}
+			else {
+				x = _P[1].getX()+ _P[2].getX() - _P[0].getX();
+				y = _P[1].getY()+ _P[2].getY() - _P[0].getY();
+			}
+			cout << "the last point is [("<< x << ", " << y << ")]" << endl;
+			Point p(x, y);
+			_P.push_back(p);
+		}
+		cout << endl;
+		return;
+	}
+	if (_P.size() <= 2) { cout << endl << "the given points cannot form only one rectangle" << endl << endl; }
+	else cout << endl << "the given points cannot form a rectangle" << endl << endl;
+}
+
+bool Square::isShape(vector<Point> P) { // judge whether the input points can form a square
+	if (P.size() > 3) { // if input more than 3 points
+		for (int i = 0; i < 4; i++) {
+			for (int j = i + 1; j < 4; j++)
+				if (P[i].getX() == P[j].getX() && P[i].getY() == P[j].getY())
+					return false;
+		}
+		if (dis(P[0], P[1]) == dis(P[2], P[3]) && mid(P[0], P[1], P[2], P[3]) && dis(P[0], P[2]) == dis(P[0], P[3]))
+			return true;
+		if (dis(P[0], P[2]) == dis(P[1], P[3]) && mid(P[0], P[2], P[1], P[3]) && dis(P[0], P[1]) == dis(P[0], P[3]))
+			return true;
+		if (dis(P[0], P[3]) == dis(P[1], P[2]) && mid(P[0], P[3], P[1], P[2]) && dis(P[0], P[1]) == dis(P[0], P[2]))
+			return true;
+		return false;
+	}
+	else {
+		if (P.size() == 3) { // if input 3 points
+			for (int i = 0; i < 3; i++) {
+				for (int j = i + 1; j < 3; j++)
+					if (_P[i].getX() == _P[j].getX() && _P[i].getY() == _P[j].getY())
+						return false;
+			}
+			if (dis(_P[0], _P[1]) == dis(_P[1], _P[2]) + dis(_P[0], _P[2]) && dis(_P[1], _P[2]) == dis(_P[0], _P[2]))
+				return true;
+			if (dis(_P[0], _P[2]) == dis(_P[0], _P[1]) + dis(_P[1], _P[2]) && dis(_P[0], _P[1]) == dis(_P[1], _P[2]))
+				return true;
+			if (dis(_P[1], _P[2]) == dis(_P[0], _P[1]) + dis(_P[0], _P[2]) && dis(_P[0], _P[1]) == dis(_P[0], _P[2]))
+				return true;
+			return false;
+		}
+		if (P.size() == 2) { // if input 2 points, use as 2 diagonal points
+			for (int i = 0; i < 2; i++) {
+				for (int j = i + 1; j < 2; j++)
+					if (_P[i].getX() == _P[j].getX() && _P[i].getY() == _P[j].getY())
+						return false;
+			}
+			return true;
+		}
+		return false; // else cannot form a square
+	}
+}
+
+double Square::area() {
+	if (_P.size() > 3) { // if input are more than 3 points
+		if (isShape(_P)) {
+			list<double> listLength;
+			listLength.push_back(_a);
+			listLength.push_back(_b);
+			listLength.push_back(_c);
+			listLength.sort();
+			list<double>::iterator it;
+			it = listLength.begin();
+			return (*it) * (*it);
+		}
+		else {
+			cout << endl << "the given points cannot form a square" << endl;
+			return -1;
+		}
+	}
+	if (_P.size() == 3) { // if input are 3 points
+		if (isShape(_P)) {
+			double length1 = sqrt(dis(_P[0], _P[1]));
+			double length2 = sqrt(dis(_P[0], _P[2]));
+			double length3 = sqrt(dis(_P[1], _P[2]));
+			list<double> listLength;
+			listLength.push_back(length1);
+			listLength.push_back(length2);
+			listLength.push_back(length3);
+			listLength.sort();
+			list<double>::iterator it;
+			it = listLength.begin();
+			double areaSqu = *it;
+			it++;
+			areaSqu *= *it;
+			return areaSqu;
+		}
+		else {
+			cout << endl << "the given points cannot form a square" << endl;
+			return -1;
+		}
+	}
+	if (_P.size() == 2) { // if input are 2 points
+		if (isShape(_P)) {
+			return _a * _a / 2;
+		}
+		else {
+			cout << endl << "the given points cannot form only one square" << endl;
+			return -1;
+		}
+	}
+	else { // if input is 1 point, cannot form only one square
+		cout << endl << "the given points cannot form only one square" << endl;
+		return -1;
+	}
+}
+
+double Square::perimeter() {
+	if (_P.size() > 3) { // if input are more than 3 points
+		if (isShape(_P)) {
+			list<double> listLength;
+			listLength.push_back(_a);
+			listLength.push_back(_b);
+			listLength.push_back(_c);
+			listLength.sort();
+			list<double>::iterator it;
+			it = listLength.begin();
+			return 4 * (*it);
+		}
+		else {
+			cout << endl << "the given points cannot form a square" << endl;
+			return -1;
+		}
+	}
+	if (_P.size() == 3) { // if input are 3 points
+		if (isShape(_P)) {
+			double length1 = dis(_P[0], _P[1]);
+			double length2 = dis(_P[0], _P[2]);
+			double length3 = dis(_P[1], _P[2]);
+			list<double> listLength;
+			listLength.push_back(length1);
+			listLength.push_back(length2);
+			listLength.push_back(length3);
+			listLength.sort();
+			list<double>::iterator it;
+			it = listLength.begin();
+			double periSqu = 2 * (*it);
+			it++;
+			periSqu += 2 * (*it);
+			return periSqu;
+		}
+		else {
+			cout << endl << "the given points cannot form a square" << endl;
+			return -1;
+		}
+	}
+	if (_P.size() == 2) { // if input are 2 points
+		if (isShape(_P)) {
+			return _a * 2 * sqrt(2);
+		}
+		else {
+			cout << endl << "the given points cannot form only one square" << endl;
+			return -1;
+		}
+	}
+	else { // if input is 1 point, cannot form only one square
+		cout << endl << "the given points cannot form only one square" << endl;
+		return -1;
+	}
+}
+
+void Square::display() { // print out the input points, area and perimeter
+	if (isShape(_P)) {
+		cout << endl;
+		cout << "----Square----" << endl;
+		cout << "P: ";
+		for (auto it : _P)
+			cout << "[" << it << "] ";
+		cout << endl;
+		cout << "Area: " << area() << endl;
+		cout << "Perimeter: " << perimeter() << endl;
+		if (_P.size() == 3) { // calculate the last point
+			double x, y;
+			if (dis(_P[0], _P[1]) > dis(_P[0], _P[2]) && dis(_P[0], _P[1]) > dis(_P[1], _P[2])) {
+				x = _P[0].getX() + _P[1].getX() - _P[2].getX();
+				y = _P[0].getY() + _P[1].getY() - _P[2].getY();
+			}
+			else if (dis(_P[0], _P[2]) > dis(_P[0], _P[1]) && dis(_P[0], _P[2]) > dis(_P[1], _P[2])) {
+				x = _P[0].getX() - _P[1].getX() + _P[2].getX();
+				y = _P[0].getY() - _P[1].getY() + _P[2].getY();
+			}
+			else {
+				x = _P[1].getX() + _P[2].getX() - _P[0].getX();
+				y = _P[1].getY() + _P[2].getY() - _P[0].getY();
+			}
+			cout << "the last point is [(" << x << ", " << y << ")]" << endl;
+			Point p(x, y);
+			_P.push_back(p);
+			cout << endl;
+			return;
+		}
+		if (_P.size() == 2) { // calculate the last 2 points
+			double x1, y1, x2, y2;
+			x1 = (_P[0].getX() + _P[1].getX()) / 2 - (_P[0].getY() - _P[1].getY()) / 2;
+			y1 = (_P[0].getY() + _P[1].getY()) / 2 + (_P[0].getX() - _P[1].getX()) / 2;
+			x2 = (_P[0].getX() + _P[1].getX()) / 2 + (_P[0].getY() - _P[1].getY()) / 2;
+			y2 = (_P[0].getY() + _P[1].getY()) / 2 - (_P[0].getX() - _P[1].getX()) / 2;
+			cout << "the last 2 point are [(" << x1 << ", " << y1 << ")] and [(" << x2 << ", " << y2 << ")]" << endl;
+			Point p1(x1, y1), p2(x2, y2);
+			_P.push_back(p1);
+			_P.push_back(p2);
+			cout << endl;
+			return;
+		}
+		cout << endl;
+		return;
+	}
+	if (_P.size() <= 1) { cout << endl << "the given points cannot form only one rectangle" << endl << endl; }
+	else cout << endl << "the given points cannot form a square" << endl << endl;
+}

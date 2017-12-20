@@ -1,0 +1,126 @@
+//more on STL
+#include <iostream>
+#include <map>
+#include <vector>
+#include <list>
+#include <string>
+using namespace std;
+class Three_D {
+public:
+	int ht;
+	int wid;
+	int dep;
+	Three_D(int i, int j, int k) { ht = i; wid = j; dep = k; }
+	Three_D() { ht = wid = dep = 0; }
+	bool operator<(Three_D T) {
+		return ((ht*wid*dep) < (T.ht*T.wid*T.dep));
+
+	}
+
+	bool operator==(Three_D T) {
+
+		return (abs(ht*wid*dep - T.ht*T.wid*T.dep) <= 2);
+	}
+
+};
+
+class course {
+public:
+	string name;
+	int section;
+	int credits;
+	course(string n, int s, int c) { name = n; section = s; credits = c; }
+};
+
+
+int main() {
+	
+	list<int> L1= { 5, 112,3,2,1 };
+	L1.sort();
+	list<int>::iterator it1 = L1.begin();
+	while (it1 != L1.end()) {
+		cout << *it1 << " ";
+		it1++;
+	}
+
+	it1 = find(L1.begin(), L1.end(), 3);
+	if (it1 != L1.end()) L1.erase(it1);
+	L1.remove(8);
+
+	cout << endl;
+	vector<int> V1 = { 5, 112,3,2,1 };
+	//V1.sort();
+	vector<int>::iterator it2 = V1.begin();
+	while (it2 != V1.end()) {
+		cout << *it2 << " ";
+		it2++;
+	}
+
+	it2 = find(V1.begin(), V1.end(), 3);
+	if (it2 != V1.end()) V1.erase(it2);
+
+
+	int AA[] = { 2, 7, 5, 11,67 };
+	int * p = find(AA, AA + 5, 5);
+	//p = AA+2;
+
+
+	map<int, string> M1;
+
+	M1[1000] = "Dave"; //key and value pair
+	M1[50] = "John";
+	M1[80] = " Pat";
+
+	//map will always sort data based on key value
+	cout << endl;
+	map<int, string>::iterator it3= M1.begin();
+	while (it3 != M1.end()) {
+		cout << it3->first << " " << it3->second << endl;
+		it3++;
+	}
+
+	it3 = M1.find(50); //find is a member funciton for map
+	if (it3 != M1.end()) M1.erase(it3);
+	//erase(it1) erase the object pointed by it1
+	//erase(it1, it2) erase all objects starting position it1 till it2 (not including it2)
+	//[it1, it2)
+
+	M1.erase(100);//map's erase allow key based removal
+	//my_vector operator*(const my_vector &V);
+	//V will be read-only inside the invoked function
+	//usually only associated with call by reference
+
+	/*
+	//left and reght references
+	//const
+	int k = 10;
+	int * const p11 = &k;
+	const int * p11; //int const * p11;
+	int const * const p11 = &k;
+	//case 1: the pointer carries a const address
+	//case 2: the int object pointed by the pointer is const
+	//case 3: Both of the above
+
+	*/
+
+
+	course C1("CIS 554", 1, 3), C2("WRT 205", 8, 3), C3("MAT 296", 4, 4), C4("CSE 674", 1, 3);
+	map<int, list<course> *> DB;
+	DB[111] = new list<course>;
+	DB[111]->push_back(C2);
+	DB[111]->push_back(C1);
+	DB[111]->push_back(C4);
+	
+	DB[2222] = new list<course>;
+
+	list<course>::iterator it4 = DB[111]->begin();
+	while (it4 != DB[111]->end()) {
+		cout << it4->name << " " << it4->section << " " << it4->credits << endl;
+		it4++;
+
+	}
+
+	getchar();
+	getchar();
+	return 0;
+}

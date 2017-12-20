@@ -1,0 +1,244 @@
+
+//HW2: Sparse Vector Operations Using Linked List structures
+//Due: 11:59PM, Friday, September 22
+
+//Implement the following member functions for class my_vector:
+//add_node
+//operator+
+//operator*
+
+
+
+#include <iostream>
+#include <fstream>
+using namespace std;
+
+ofstream out("data1.txt");
+class node {
+public:
+	int value;
+	int position;
+	node * next;
+	node() { value = -9999; position = -1; next = nullptr; }
+	node(int i, int j) { value = i; position = j; next = nullptr; }
+};
+
+class my_vector {
+public:
+	int size;
+	int num_nodes; //number of non-zero elements
+	node * head;
+	my_vector() { size = num_nodes = 0; head = nullptr; }
+
+	void add_node(int v, int p); //add a new node with value v and position p;
+								 //if a node at position p already exists, update its value to v
+
+	void make_random_vector(int s, int n, int k);
+	//set the value of size  to s;
+	//randomly create n nodes in -(k-1) to k-1
+
+	my_vector operator+(my_vector V); //vector addition
+
+	int operator*(my_vector V);//inner product
+
+	void print();
+};
+
+void my_vector::make_random_vector(int s, int n, int k) {
+	size = s;
+	for (int i = 0; i < n; i++) {
+		int p = rand() % s;
+		int v = rand() % (2 * k - 1) - (k - 1);
+		add_node(v, p);
+	}
+}
+void my_vector::add_node(int v, int p) {
+
+	int num = 0;
+	node *p1 = new node(v, p);
+	node *it,*it1;
+
+	if (v == 0) {
+		if (head->position == p) {
+			head = head->next;
+			return;
+		}
+		else
+		for (it = head; it != nullptr; it = it->next) {
+
+			if (it->position == p)
+			{
+				for (it1 = head; it1->next!= it; it1 = it1->next);
+					it1->next = it1->next->next;
+					return;
+
+	
+			}
+			
+		}
+	}
+	if (head == nullptr) {
+		head = p1;
+		return;			
+	}
+	else if (p < head->position)
+	{
+		p1->next = head;
+		head = p1;
+		return;
+	}
+	else
+	{
+		for (it = head; it->next != nullptr; it = it->next) {
+			if ((p > it->position) && (p < it->next->position)) {
+				p1->next = it->next;
+				it->next = p1;
+				return;
+			}
+			if (it->position == p) {
+				it->value = v;
+				return;
+			}
+		}
+		if (it->position == p)it->value = v;
+		else it->next = p1;
+
+	}
+	
+}
+void my_vector::print() {
+	out << endl;
+	node * p = head;
+	while (p != nullptr) {
+		out << p->value << " " << p->position << "  ";
+		p = p->next;
+	}
+}
+
+int my_vector::operator*(my_vector V) {
+	if (num_nodes != V.num_nodes) {
+		cout << "The two vectors have different siezes. ERROR.";
+		return 0;
+	}
+	int temp = 0;
+	node *p1, *p2;
+	p1 = head, p2 = V.head;
+	while (p1 != nullptr && p2 != nullptr) {
+		if (p1->position > p2->position)
+		{
+			p2 = p2->next;
+			continue;
+		}
+		if (p1->position < p2->position)
+		{
+			p1 = p1->next;
+			continue;
+		}
+		if (p1->position == p2->position)
+		{
+			temp = temp + (p1->value)*(p2->value);
+			p1 = p1->next, p2 = p2->next;
+			continue;
+		}
+	}
+
+
+	return temp;
+}
+my_vector my_vector::operator+(my_vector V) {
+	my_vector temp;
+	//if (num_nodes != V.num_nodes) {
+	//	cout << "The two vectors have different siezes. ERROR.";
+	//	temp = new vector(-9999, -9999);
+	//	return;
+	//}
+	temp.num_nodes = num_nodes;
+	//You need to complete the implementation.
+	node *p1, *p2;
+	p1 = head, p2 = V.head;
+	while (p1 != nullptr || p2 != nullptr)
+	{
+		if (p1 == nullptr)
+		{
+			temp.add_node(p2->value, p2->position);
+			p2 = p2->next;
+			continue;
+		}
+		if (p2 == nullptr)
+		{
+			temp.add_node(p1->value, p1->position);
+			p1 = p1->next;
+			continue;
+		}
+		if (p1->position > p2->position)
+		{
+			temp.add_node(p2->value, p2->position);
+			p2 = p2->next;
+			continue;
+		}
+		if (p1->position < p2->position)
+		{
+			temp.add_node(p1->value, p1->position);
+			p1 = p1->next;
+			continue;
+		}
+		if (p1->position == p2->position)
+		{
+			if (p1->value + p2->value) {
+				temp.add_node(p1->value + p2->value, p1->position);
+				p1 = p1->next, p2 = p2->next;
+				continue;
+			}
+
+		}
+	}
+	return temp;
+}
+int main() {
+
+	my_vector V1, V2, V3;
+	V1.make_random_vector(30, 8, 10);
+	V1.print();
+	V2.make_random_vector(30, 6, 10);
+	V2.print();
+	V3 = V1 + V2;
+	V3.print();
+	int inner_product = V1 * V2;
+	out << inner_product << endl;
+
+	out.close();
+	return 0;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

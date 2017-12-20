@@ -1,0 +1,88 @@
+//Linked List
+#include <iostream>
+using namespace std;
+
+class node {
+public:
+	int value;
+	node * next;
+	node() { next = nullptr; }
+	node(int k) { value = k; next = nullptr; }
+};
+
+class linked_list {
+public:
+	int num_nodes;
+	node * head;
+	linked_list() { num_nodes = 0; head = nullptr; }
+	void make_random_list(int k);//create a linked list of 
+	//k nodes with values in 0 ..99 randomly
+	void print();
+	void reverse();
+	void sort();
+
+};
+void linked_list::make_random_list(int k) {
+	node * p;
+	for (int i = 0; i < k; i++) {
+		p = new node(rand() % 100);
+		p->next = head;
+		head = p;
+		num_nodes++;
+	}
+}
+
+void linked_list::print() {
+	node * p = head;
+	cout << endl;
+	while (p != nullptr) {
+		cout << p->value << " ";
+		p = p->next;
+	}
+}
+
+void linked_list::reverse() {
+	if (num_nodes <= 1) return;
+	node * p1 = head, *p2 = head->next, *p3;
+	while (p2 != nullptr) {
+		p3 = p2->next;
+		p2->next = p1;
+		if (p1 == head) p1->next = nullptr;
+		p1 = p2;
+		p2 = p3;
+	}
+	head = p1;
+}
+int main() {
+	/*
+	node * head = nullptr, *p;
+	int num_nodes=0;
+	int k = 5;
+	for (int i = 0; i < k; i++) {
+		p = new node(i);
+		//(*p).next = head;
+		p->next = head;
+		head = p;
+		num_nodes++;
+	}
+	p = head;
+	cout << endl;
+	while (p != nullptr) {
+		cout << (*p).value << " ";
+		//p = (*p).next;
+		p = p->next;
+	}
+
+	*/
+	
+	linked_list L1;
+	L1.make_random_list(20);
+	L1.print();
+	L1.reverse();
+	L1.print();
+
+	getchar();
+	getchar();
+	return 0;
+
+}

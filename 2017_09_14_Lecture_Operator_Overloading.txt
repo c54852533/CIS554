@@ -1,0 +1,70 @@
+//Operator Overloading
+
+#include <iostream>
+using namespace std;
+
+class Three_D {
+public:
+	int wid;
+	int ht;
+	int dep;
+	Three_D() { wid = ht = dep = 0; }
+	Three_D(int i, int j, int k) { wid = i; ht = j; dep = k; }
+	Three_D operator+(Three_D T);
+	//Unary
+	Three_D operator++(); //prefix
+	Three_D operator++(int not_used); //postfix
+	int & operator[](int k);//returning reference
+
+
+};
+
+int & Three_D::operator[](int k) { //I didn't validatek k
+
+	switch (k) {
+	case (0) : return ht;
+	case (1) : return wid;
+	case (2) : return dep;
+	}
+
+}
+
+Three_D Three_D::operator++() { //pre-fix
+	++ht;
+	++wid;
+	++dep;
+	return *this; //this is a pointer pointing to the current object
+}
+
+Three_D Three_D::operator++(int not_used) { //postfix
+	Three_D temp = *this;
+	ht++;
+	wid++;
+	dep++;
+	return temp;
+}
+
+Three_D Three_D::operator+(Three_D T) {
+	Three_D temp;
+	temp.ht = ht + T.ht;
+	temp.wid = wid + T.wid;
+	temp.dep = dep + T.dep;
+	return temp;
+}
+
+int main() {
+	Three_D t1, t2(3, 4, 5), t3(2, 1, 2);
+	t1 = t2 + t3; //t1 = t2.operator+(t3);
+	t1 = ++t2; //prefix  t1 = t2.operator++()
+	t1 = t2++; //post-fix
+
+	int i = t2[2]; 
+	t2[2] = 10;
+
+	getchar();
+	getchar();
+	return 0;
+}
+
+
+

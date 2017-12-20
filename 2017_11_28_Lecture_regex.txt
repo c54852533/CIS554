@@ -1,0 +1,32 @@
+#include <regex>
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+int main() {
+	string str;
+	while (true) {
+
+		cin >> str;
+		//regex e("abc");
+
+		//regex e("abc?"); //zero or 1 preceding character
+		//regex e("abc*"); //zero or more preceding charter
+		//regex e("abc+"); // one or more preceding charter
+		//	regex e("ab[cd]");
+		//regex e("ab[cd]*"); //any char inside the square brackets
+		//regex e("ab[^cd]*"); //any char not inside the square brackets
+		//	regex e("ab[cd]{3}"); //any three char inside the square brackets
+		//regex e("ab[cd]{3,5}"); //3 to 5
+		//regex e("abc|de[fg]"); //abc or de followed by f or g
+		
+		regex e("(abc)de+\\1"); //abc is now a group and can be invoked by \\1
+		
+
+		bool match = regex_match(str, e);
+		cout << (match ? "Matched" : "Not Matched") << endl << endl;
+
+	}
+
+}

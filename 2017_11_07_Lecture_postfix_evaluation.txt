@@ -1,0 +1,73 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <string>
+#include <stack>
+#include <stdlib.h>
+using namespace std;
+class tree_node {
+public:
+	string s;
+	tree_node * left_child;
+	tree_node * right_child;
+	tree_node() {s = ""; left_child = NULL; right_child = NULL;}
+};
+
+tree_node * form_tree(vector<string> &exp);
+double eval(tree_node *);
+
+void main() {
+	vector<string> exp;
+	string s;
+	tree_node * root;
+	ifstream in("postfix.txt");
+	while (!in.eof()) {
+		in >> s;
+		cout << s <<"\n";
+		exp.push_back(s);
+	}
+	in.close();
+	root = form_tree(exp);
+	cout << "the expressin value = " <<eval(root)  << "\n";
+	
+	getchar();
+	getchar();
+}
+
+tree_node * form_tree(vector<string> &exp) {
+stack<tree_node *> stack_1;
+tree_node * ps;
+for (size_t k=0; k<exp.size(); k++)
+{
+	ps=new tree_node;
+	ps->s = exp[k];
+
+  if (exp[k] == "+"  || exp[k] == "-" || exp[k]=="*" || exp[k]== "/" )
+  {
+	
+	  ps->right_child = stack_1.top();
+	  stack_1.pop();
+	  ps->left_child = stack_1.top();
+	  stack_1.pop();
+	  stack_1.push(ps);
+  }
+  else stack_1.push(ps);
+}
+return ps;
+}
+
+double eval(tree_node *p) {
+	string s_temp = p->s;
+if (p->s == "+") return eval(p->left_child) + eval(p->right_child);
+else if (p->s == "-") return eval(p->left_child) - eval(p->right_child);
+else if (p->s == "*") return eval(p->left_child) * eval(p->right_child);
+else if (p->s == "/") return eval(p->left_child) / eval(p->right_child);
+else return stod(p->s);
+}
+
+
+/*
+The following is an example input
+1 22 + 3 * 23 / 1 -
+
+*/

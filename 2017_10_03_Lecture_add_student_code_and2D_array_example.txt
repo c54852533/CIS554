@@ -1,0 +1,18 @@
+//my code for add_student
+
+void add_student(map<int, map<int, list<course> * >> &DB, int id) {
+	if (DB.find(id) != DB.end()) return;
+	map<int, list<course> *> M1;
+	DB[id] = M1;
+}
+
+
+//The following statements will all print value 20
+
+	int A[3][4];
+
+	A[1][2] = 20;
+	cout << A[1][2] << endl;
+	cout << *(*(A + 1) + 2) << endl;
+	cout << *(A[1] + 2) << endl;
+	cout << *(&A[0][0] + 1 * 4 + 2) << endl;

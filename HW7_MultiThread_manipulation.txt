@@ -1,0 +1,185 @@
+
+#include <iostream>
+#include <thread>
+#include <vector>
+#include <mutex>
+#include <condition_variable>
+#include <ctime>
+#include <random>
+#include <stdlib.h>
+using namespace std;
+
+mutex mtx;
+//shared buffer place
+vector<int> buffer_state(3);
+//constant buffer capacity
+vector<int> buffer_capacity = { 6, 5, 4 };
+//use 6 condition variables, 2 for each part.
+//capared with 2 condition varables(1 for each worker type)
+//more complicate but more precise, only waking up the workers who need to place or pick up
+//fewer deadlocks generated, more likely to finish all threads(have finished(get every threads joined) in debug)
+vector<pair<condition_variable, condition_variable> > cv(3);
+
+
+
+void PartWorker(int id) {
+	//rand() is not thread safe, so we need to set seed every thread
+	srand(time(NULL)+id);
+	unique_lock<mutex> lck(mtx);
+	vector<bool> placeNeedUpdate(3);
+	vector<int> placeRequest(3);
+	bool firstRound = true;
+	//randomly create new place request(3 parts)
+	for (int i = 0; i < 3; i++) {
+		placeRequest[rand() % 3]++;
+	}
+	for (int i = 0; i < 3; i++) {
+		//initial all non-zero parts need-to-update
+		if (placeRequest[i] != 0) placeNeedUpdate[i] = true;
+	}
+	//only situation where this thread finishs is all requests become 0 or be in a while loop
+	while (!(placeRequest[0] == 0 && placeRequest[1] == 0 && placeRequest[2] == 0)) {
+		cout << "PartWorker ID:" << id << endl;
+		cout << "Buffer State: (" << buffer_state[0] << "," << buffer_state[1] << "," << buffer_state[2] << ")" << endl;
+		cout << "Place Request: (" << placeRequest[0] << "," << placeRequest[1] << "," << placeRequest[2] << ")" << endl;
+		for (int i = 0; i < 3; i++) {
+			//this channel does not change, won't notify other
+			if (!placeNeedUpdate[i]) continue;
+			//this channel does not change, won't notify other
+			if (buffer_state[i] == buffer_capacity[i]) continue;
+			//can put all parts into buffer
+			if ((buffer_state[i] + placeRequest[i]) < buffer_capacity[i]) {
+				buffer_state[i] += placeRequest[i];
+				placeRequest[i] = 0;
+			}
+			//still remain
+			else {
+				placeRequest[i] -= (buffer_capacity[i] - buffer_state[i]);
+				buffer_state[i] = buffer_capacity[i];
+			}
+			//this channel notify some product worker
+			cv[i].second.notify_one();
+		}
+		//if (firstRound) cout << "First time come" << endl;
+		//firstRound = false;
+		cout << "Updated Buffer State: (" << buffer_state[0] << "," << buffer_state[1] << "," << buffer_state[2] << ")" << endl;
+		cout << "Updated Place Request: (" << placeRequest[0] << "," << placeRequest[1] << "," << placeRequest[2] << ")" << endl;
+		cout << endl;
+		for (int i = 0; i < 3; i++) {
+			if (placeRequest[i] != 0) {
+				//if not empty, wait
+				cv[i].first.wait(lck);
+				//once awake, check all channel whether can be updated
+				//if no channel can be updated, back to for loop with same i to wait again
+				for (int i = 0; i < 3; i++) {
+					//there is place in buffer, then update
+					if (placeRequest[i] != 0 && buffer_state[i] != buffer_capacity[i]) placeNeedUpdate[i] = true;
+					else placeNeedUpdate[i] = false;
+				}
+				if (placeNeedUpdate[0] == false && placeNeedUpdate[1] == false && placeNeedUpdate[2] == false) { i--; continue; }
+				//jump out to update
+				break;
+			}
+		}
+	}
+	//cout << "PartWorker ID: " << id << " Finish" << endl;
+	//cout << endl;
+
+}
+
+void ProductWorker(int id) {
+	srand(time(NULL)+id);
+	unique_lock<mutex> lck(mtx);
+	vector<bool> pickUpNeedUpdate(3);
+	vector<int> pickUpRequest(3);
+	bool firstRound = true;
+	//randomly create new pick up request(4 parts)
+	//choose a postion that doesn't hold value
+	int dontPickUp = rand() % 3;
+	for (int i = 0; i < 4; i++) {
+		int pickUpLocation = rand() % 3;
+		//if randomly picked position is the dontPickUp postion, then go back to the for loop with same i to pick a differen position
+		if (pickUpLocation == dontPickUp) {
+			i--;
+			continue;
+		}
+		//guarantee not all 4 value in one positon--if one position already holds 3, choose any other one(don't care dontPickUp postion any more)
+		while (pickUpRequest[pickUpLocation] == 3) {
+			pickUpLocation = rand() % 3;
+		}
+		pickUpRequest[pickUpLocation]++;
+	}
+	for (int i = 0; i < 3; i++) {
+		if (pickUpRequest[i] != 0) pickUpNeedUpdate[i] = true;
+	}
+	while (!(pickUpRequest[0] == 0 && pickUpRequest[1] == 0 && pickUpRequest[2] == 0)) {
+		cout << "ProductWorker ID:" << id << endl;
+		cout << "Buffer State: (" << buffer_state[0] << "," << buffer_state[1] << "," << buffer_state[2] << ")" << endl;
+		cout << "Pickup Request: (" << pickUpRequest[0] << "," << pickUpRequest[1] << "," << pickUpRequest[2] << ")" << endl;
+		for (int i = 0; i < 3; i++) {
+			if (!pickUpNeedUpdate[i]) continue;
+			if (buffer_state[i] == 0) continue;
+			if (buffer_state[i] >= pickUpRequest[i]) {
+				buffer_state[i] -= pickUpRequest[i];
+				pickUpRequest[i] = 0;
+			}
+			else {
+				pickUpRequest[i] -= buffer_state[i];
+				buffer_state[i] = 0;
+			}
+			cv[i].first.notify_one();
+		}
+		//if (firstRound) cout << "First time come" << endl;
+		//firstRound = false;
+		cout << "Updated Buffer State: (" << buffer_state[0] << "," << buffer_state[1] << "," << buffer_state[2] << ")" << endl;
+		cout << "Updated Pickup Request: (" << pickUpRequest[0] << "," << pickUpRequest[1] << "," << pickUpRequest[2] << ")" << endl;
+		cout << endl;
+		for (int i = 0; i < 3; i++) {
+			if (pickUpRequest[i] != 0) {
+				cv[i].second.wait(lck);
+				for (int i = 0; i < 3; i++) {
+					if (pickUpRequest[i] != 0 && buffer_state[i] != 0) pickUpNeedUpdate[i] = true;
+					else pickUpNeedUpdate[i] = false;
+				}
+				if (pickUpNeedUpdate[0] == false && pickUpNeedUpdate[1] == false && pickUpNeedUpdate[2] == false) { i--; continue; }
+				break;
+			}
+		}
+	}
+	//cout << "ProductWorker ID: " << id << " Finish" << endl;
+	//cout << endl;
+}
+
+
+int main() {
+	thread partW[10];
+	thread prodW[7];
+
+
+	for (int i = 0; i < 7; i++) {
+		partW[i] = thread(PartWorker, i);
+		prodW[i] = thread(ProductWorker, i);
+	}
+
+	for (int i = 7; i < 10; i++) {
+		partW[i] = thread(PartWorker, i);
+	}
+
+	/* Join the threads to the main threads */
+	for (int i = 0; i < 7; i++) {
+		partW[i].join();
+		prodW[i].join();
+	}
+
+	for (int i = 7; i<10; i++) {
+		partW[i].join();
+	}
+
+	cout << "Finish!" << endl;
+
+	getchar();
+	getchar();
+
+	return 0;
+
+}
